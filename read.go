@@ -39,7 +39,7 @@ func (c *ConfigFile) read(read io.Reader) (err error) {
 			continue
 		case line[0] == '#' || line[0] == ';':
 			continue
-		case section[0] == '[' && section[len(section)-1] == ']':
+		case line[0] == '[' && line[len(line)-1] == ']':
 			section = strings.TrimSpace(line[1 : lineLength-1])
 			c.SetValue(section, "", "")
 		case section == "":

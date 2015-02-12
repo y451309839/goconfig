@@ -44,6 +44,18 @@ func NewConfigFile(name string) *ConfigFile {
 	return c
 }
 
+func (c *ConfigFile) HasSection(section string) bool {
+	_, ok := c.data[section]
+	return ok
+}
+
+func (c *ConfigFile) GetSection(section string) map[string]string {
+	if sections, ok := c.data[section]; ok {
+		return sections
+	}
+	return nil
+}
+
 func (c *ConfigFile) SetValue(section, key, value string) bool {
 	if len(section) == 0 {
 		section = DEFAULT_SECTION
