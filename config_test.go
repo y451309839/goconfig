@@ -22,7 +22,9 @@ func Test_String(t *testing.T) {
 	username, _ := cfg.String("", "username")
 	password, _ := cfg.String("DEFAULT", "password")
 	testdata, _ := cfg.String("CONFIGS", "testdata")
+	testarray := cfg.Array("CONFIGS", "testarray", ",")
 	fmt.Printf("cfg.String(\"\", \"username\") result is: %s\n", username)
 	fmt.Printf("cfg.String(\"DEFAULT\", \"password\") result is: %s\n", password)
 	fmt.Printf("cfg.String(\"CONFIGS\", \"testdata\") result is: %s\n", testdata)
+	fmt.Printf("cfg.Array(\"CONFIGS\", \"testarray\") result array is: %s\n", testarray)
 }
