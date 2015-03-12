@@ -44,6 +44,12 @@ func NewConfigFile(name string) *ConfigFile {
 	return c
 }
 
+func NewConfig(name, file string) *ConfigFile {
+	cfg := NewConfigFile(name)
+	cfg.LoadFile(file)
+	return cfg
+}
+
 func (c *ConfigFile) HasSection(section string) bool {
 	_, ok := c.data[section]
 	return ok
@@ -152,7 +158,9 @@ func (c *ConfigFile) Array(section, key, delim string) []string {
 	if err != nil || len(val) == 0 {
 		return []string{}
 	}
-
+	if delim == "" {
+		delim = DEFAULT_ARRAYSEP
+	}
 	vals := strings.Split(val, delim)
 	for i := range vals {
 		vals[i] = strings.TrimSpace(vals[i])

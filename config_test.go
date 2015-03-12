@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+func Test_Config(t *testing.T) {
+	cfg := NewConfig("test", "test.ini")
+	fmt.Printf("cfg.data is: %s\n", cfg.data)
+}
+
 func Test_newConfig(t *testing.T) {
 	cfg := NewConfigFile("test")
 	cfg.LoadFile("test.ini")
