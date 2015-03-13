@@ -7,6 +7,10 @@
 
 
 使用：
+  
+  import "github.com/y451309839/gopinyin"
+
+  ......
 
   cfg := goconfig.NewConfig("程序配置", "test.ini")
   
