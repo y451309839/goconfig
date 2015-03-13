@@ -20,6 +20,7 @@ func (c *ConfigFile) read(read io.Reader) (err error) {
 	}
 
 	section := DEFAULT_SECTION
+	var comments string
 	for {
 		line, err := buf.ReadString('\n')
 		line = strings.TrimSpace(line)
@@ -38,10 +39,20 @@ func (c *ConfigFile) read(read io.Reader) (err error) {
 		case lineLength == 0:
 			continue
 		case line[0] == '#' || line[0] == ';':
+			if len(comments) == 0 {
+				comments = line
+			} else {
+				comments += breakLine + line
+			}
 			continue
 		case line[0] == '[' && line[len(line)-1] == ']':
 			section = strings.TrimSpace(line[1 : lineLength-1])
+			if len(comments) > 0 {
+				c.SetSectionComments(section, comments)
+				comments = ""
+			}
 			c.SetValue(section, "", "")
+			continue
 		case section == "":
 			return readError{ErrBlankSectionName, line}
 		default:
@@ -108,6 +119,10 @@ func (c *ConfigFile) read(read io.Reader) (err error) {
 				value = strings.TrimSpace(lineRight[0:])
 			}
 
+			if len(comments) > 0 {
+				c.SetKeyComments(section, key, comments)
+				comments = ""
+			}
 			c.SetValue(section, key, value)
 		}
 	}
@@ -121,6 +136,7 @@ func (c *ConfigFile) LoadFile(filename string) (err error) {
 	}
 	defer f.Close()
 
+	c.fileName = filename
 	return c.read(f)
 }
 

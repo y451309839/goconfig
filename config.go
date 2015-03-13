@@ -30,10 +30,13 @@ func init() {
 }
 
 type ConfigFile struct {
-	configName  string                       //配名
-	data        map[string]map[string]string //节点 -> 键 : 值
-	sectionList []string                     //节点
-	keyList     map[string][]string          //节点 -> 键
+	configName      string                       //别名
+	fileName        string                       //文件名
+	data            map[string]map[string]string //节点 -> 键 : 值
+	sectionList     []string                     //节点
+	keyList         map[string][]string          //节点 -> 键
+	sectionComments map[string]string            //节点注释
+	keyComments     map[string]map[string]string //键注释
 }
 
 func NewConfigFile(name string) *ConfigFile {
@@ -41,6 +44,8 @@ func NewConfigFile(name string) *ConfigFile {
 	c.configName = name
 	c.data = make(map[string]map[string]string)
 	c.keyList = make(map[string][]string)
+	c.sectionComments = make(map[string]string)
+	c.keyComments = make(map[string]map[string]string)
 	return c
 }
 
@@ -81,6 +86,22 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 		c.keyList[section] = append(c.keyList[section], key)
 	}
 	return !ok
+}
+
+func (c *ConfigFile) SetString(section, key, value string) bool {
+	return c.SetValue(section, key, value)
+}
+
+func (c *ConfigFile) SetArray(section, key string, array []string) bool {
+	return c.SetValue(section, key, strings.Join(array, DEFAULT_ARRAYSEP))
+}
+
+func (c *ConfigFile) SetInt(section, key string, i int) bool {
+	return c.SetValue(section, key, strconv.Itoa(i))
+}
+
+func (c *ConfigFile) SetBool(section, key string, b bool) bool {
+	return c.SetValue(section, key, strconv.FormatBool(b))
 }
 
 func (c *ConfigFile) DeleteKey(section, key string) bool {
@@ -174,6 +195,75 @@ func (c *ConfigFile) MustValue(section, key string, defaultVal ...string) string
 		return defaultVal[0]
 	}
 	return val
+}
+
+func (c *ConfigFile) SetSectionComments(section, comments string) bool {
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
+	if len(comments) == 0 {
+		if _, ok := c.sectionComments[section]; ok {
+			delete(c.sectionComments, section)
+		}
+		return true
+	}
+
+	_, ok := c.sectionComments[section]
+	if comments[0] != '#' && comments[0] != ';' {
+		comments = "; " + comments
+	}
+	c.sectionComments[section] = comments
+	return !ok
+}
+
+//此处使用comments作返回值，作用是当section不存在时返回空字符串（即comments）
+func (c *ConfigFile) GetSectionComments(section string) (comments string) {
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
+	return c.sectionComments[section]
+}
+
+func (c *ConfigFile) SetKeyComments(section, key, comments string) bool {
+
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
+	if _, ok := c.keyComments[section]; ok {
+		if len(comments) == 0 {
+			if _, ok := c.keyComments[section][key]; ok {
+				delete(c.keyComments[section], key)
+			}
+			return true
+		}
+	} else {
+		if len(comments) == 0 {
+			return true
+		} else {
+			c.keyComments[section] = make(map[string]string)
+		}
+	}
+
+	_, ok := c.keyComments[section][key]
+	if comments[0] != '#' && comments[0] != ';' {
+		comments = "; " + comments
+	}
+	c.keyComments[section][key] = comments
+	return !ok
+}
+
+func (c *ConfigFile) GetKeyComments(section, key string) (comments string) {
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
+	if _, ok := c.keyComments[section]; ok {
+		return c.keyComments[section][key]
+	}
+	return ""
 }
 
 // readError 格式化错误信息
