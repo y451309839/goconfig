@@ -8,17 +8,10 @@
 
 使用：
 
-  cfg := goconfig.NewConfigFile("sitecfg")
-  
-  err := cfg.LoadFile(cfgname)
-  
-  if err != nil {
-  
-  	fmt.Println(err.Error())
-  	
-  }
+  cfg := goconfig.NewConfig("程序配置", "test.ini")
   
   //user := cfg.String("DEFAULT", "user")
   
   user := cfg.String("", "user")
+  
   
