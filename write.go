@@ -9,7 +9,7 @@ import (
 // 在等号边加上空格更好看
 var PrettyFormat = true
 
-func (c *ConfigFile) saveFile(filename string) (err error) {
+func (c *ConfigFile) SaveFile(filename string) (err error) {
 	if len(filename) == 0 {
 		filename = c.fileName
 	}
