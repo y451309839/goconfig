@@ -67,6 +67,10 @@ func (c *ConfigFile) GetSection(section string) map[string]string {
 	return nil
 }
 
+func (c *ConfigFile) GetSectionList() []string {
+	return c.sectionList
+}
+
 func (c *ConfigFile) SetValue(section, key, value string) bool {
 	if len(section) == 0 {
 		section = DEFAULT_SECTION
